@@ -1,0 +1,40 @@
+{
+  "Information": {
+    "camera_serial_number": "leave blank if you have one cam, enter cam sn if you have multiple",
+    "exposure_time": "",
+    "do_camera_inference" : "enable if you want to see ffy inference",
+    "camera_mode": "enable to collect data from camera",
+    "path_to_output_data_root_folder": "location of the root of the output data. ex. c:/temp/ -> c:/temp/class1/",
+    "max_display_window_height": "and height this is only for displaying the image on screen",
+    "file_extension": "extension to save the file to",
+    "input_image_directory": "location of the images to read and 'sort'; to be implemented",
+    "labels": "the key and class you wish to bind each key to",
+    "camera_inference_labels": "the index of each label from camera or label file"
+  },
+  "camera_serial_number_other":"",
+  "camera_serial_number_other2":"",
+  "camera_serial_number":"",
+  "exposure_time": 20000,
+  "do_camera_inference": true,
+  "camera_mode":true,
+  "path_to_output_data_root_folder":".\\smart_pet_bowl",
+  "max_display_window_height":1000,
+  "max_display_window_width":1000,
+  "file_extension": "png",
+  "input_image_directory_dockmaster":"/home/douglasc/Pictures",
+  "input_image_directory":"/home/douglasc/TEMP/imdbwiki",
+  "input_image_directory_hp":"C:\\temp\\images\\20180307_colour_stairwell",
+  "input_image_directory_home":"D:\\temp\\pcb_windows\\images\\jpg",
+  "camera_inference_labels":
+  {
+    "0": "foodempty",
+    "1": "foodfull",
+    "2": "other"
+  },
+  "labels":
+  {
+    "0": "foodempty",
+    "1": "foodfull",
+    "2": "other"
+  }
+}
