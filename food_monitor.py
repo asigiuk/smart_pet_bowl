@@ -45,6 +45,8 @@ def read_json_to_dict(json_file):
 
 
 def prepare_folders_and_options(configuration):
+    if not os.path.exists(configuration[ROOT_FOLDER]):
+        os.makedirs(configuration[ROOT_FOLDER])
     folders = {}
     for each in configuration[LABELS]:
         folder_name = fr"{configuration[ROOT_FOLDER]}{dirsep}{configuration[LABELS][each]}"
