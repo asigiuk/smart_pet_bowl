@@ -78,6 +78,7 @@ def do_camera_stuff(configuration):
         except:
             print("Error setting up camera to do inference running in default camera mode.")
             enable_camera_inference = False
+            sys.exit
 
 
     img = camera.get_next_image().GetNDArray()
@@ -121,7 +122,7 @@ def do_camera_stuff(configuration):
 
         displayed_image = cv2.resize(img, dim, interpolation=cv2.INTER_AREA)
 
-        # cls = dummy_status
+        # current_food_status = dummy_status
         # conf = dummy_status
         if enable_camera_inference:
             origin = (30, 30)
@@ -129,27 +130,54 @@ def do_camera_stuff(configuration):
             font_scale = 0.5
             color = (255, 0, 0)
             thickness = 1
-            cls, conf, time = inference_info
+            current_food_status, conf, time = inference_info
             displayed_image = cv2.putText(
                 displayed_image,
-                f"Class:{configuration[INFERENCE_LABELS][f'{cls}']} | Confidence:{conf*100.0:.2f}",
+                f"Class:{configuration[INFERENCE_LABELS][f'{current_food_status}']} | Confidence:{conf*100.0:.2f}",
                 origin, font, font_scale, color, thickness, cv2.LINE_AA)
 
         # basic filter function
-        if cls != previous_food_status and conf > config[CONFIDENCE]:
+        if current_food_status != previous_food_status and conf > config[CONFIDENCE]:
             counter += 1
 
-        # change food status
-        if cls != previous_food_status and conf > config[CONFIDENCE] and counter > config[DELAY_INTERVAL]:
+        if current_food_status != previous_food_status and conf > config[CONFIDENCE] and counter > config[DELAY_INTERVAL]:
+            #################################################
+            # change food status
+            #################################################
+
             # print(counter)
-            print(configuration[INFERENCE_LABELS][f'{cls}'])
-            previous_food_status = cls
+            print(configuration[INFERENCE_LABELS][f'{current_food_status}'])
+            previous_food_status = current_food_status
             # save image
             cv2.imwrite(f"{configuration[ROOT_FOLDER]}/food_status.png",img)
             print(f"image saved to {configuration[ROOT_FOLDER]}/food_status.png")
             counter = 0
 
+            # prepare data for post request
+            url = 'http://192.168.1.75:8080/rest/items/TestSwitch001'
+            headers1 = {
+                'Content-Type': 'text/plain'
+            }
+            auth1 = ('avner', 'avner4')
+            data1 = 'na'
 
+            label_name = configuration[INFERENCE_LABELS][f'{current_food_status}']
+            if label_name == 'foodempty':
+                print('Trigger: ', label_name)
+                data1 = 'OFF'
+                r = requests.post(url, data=data1, auth=auth1, headers=headers1)
+            elif label_name == 'foodfull':
+                print('Trigger: ', label_name)
+                data1 = 'ON'
+                r = requests.post(url, data=data1, auth=auth1, headers=headers1)
+            elif label_name == 'other':
+                # Do nothing
+                # print('Trigger other', label_name)
+                data1 = 'Invalid'
+            else:
+                print('label_name is not supported', label_name)
+
+            
         cv2.imshow("Camera Stream", displayed_image)
         lame = cv2.waitKey(1)
         if not lame == -1:
