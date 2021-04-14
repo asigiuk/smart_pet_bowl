@@ -96,7 +96,8 @@ def do_camera_stuff(configuration):
     width = int(img.shape[1] * scale_ratio)
     height = int(img.shape[0] * scale_ratio)
     dim = (width, height)
-
+    previous_food_status = 10
+    counter = 0
     while True:
         # Capture frame-by-frame
         inference_info = ()
@@ -120,13 +121,15 @@ def do_camera_stuff(configuration):
                 displayed_image,
                 f"Class:{configuration[INFERENCE_LABELS][f'{cls}']} | Confidence:{conf*100.0:.2f}",
                 origin, font, font_scale, color, thickness, cv2.LINE_AA)
-        # if True:
-        #     displayed_image = add_keybindings(displayed_image, configuration)
-        # Display the resulting frame
-        if cls == previous_food_status:
 
-        previous_food_status = cls
-        print(configuration[INFERENCE_LABELS][f'{cls}'])
+        # change food status
+        if cls != previous_food_status and conf > 0.95:
+            print(configuration[INFERENCE_LABELS][f'{cls}'])
+            previous_food_status = cls
+            # save image
+            cv2.imwrite(f"{configuration[ROOT_FOLDER]}/food_status.png",img)
+            print(f"image saved to {configuration[ROOT_FOLDER]}/food_status.png")
+
 
         cv2.imshow("Camera Stream", displayed_image)
         lame = cv2.waitKey(1)
