@@ -7,6 +7,10 @@ import os
 import datetime
 import sys
 from parameters import *
+import subprocess
+import requests
+import json
+
 dirsep = ""
 
 if sys.platform == 'linux' or sys.platform == 'darwin':
@@ -103,6 +107,7 @@ def do_camera_stuff(configuration):
     height = int(img.shape[0] * scale_ratio)
     dim = (width, height)
     previous_food_status = 10
+    dummy_status = 11
     counter = 0
     while True:
         # Capture frame-by-frame
@@ -116,6 +121,8 @@ def do_camera_stuff(configuration):
 
         displayed_image = cv2.resize(img, dim, interpolation=cv2.INTER_AREA)
 
+        cls = dummy_status
+        conf = dummy_status
         if enable_camera_inference:
             origin = (30, 30)
             font = cv2.FONT_HERSHEY_SIMPLEX
@@ -148,7 +155,31 @@ def do_camera_stuff(configuration):
         if not lame == -1:
             print('#########', lame, ord('1'), ord('!'), '1'.upper())
         if lame == ord('\x1b'):
+            # Escape char (hex1b, dec 27)
             break
+        elif (lame == ord('\xbe')) or (lame == ord('\xbf')):
+            url = 'http://192.168.1.75:8080/rest/items/TestSwitch001'
+            headers1 = {
+                'Content-Type': 'text/plain'
+            }
+            auth1 = ('avner', 'avner4')
+
+            data1 = 'na'
+            if lame == ord('\xbe'):
+                # trigger BowlEmpty (F1 - hex: xBE, dec: 190)
+                print('Trigger bowlEmpty', lame)
+                data1 = 'ON'
+            else:
+                # trigger BowlFull (F2 - hex: xBF, dec: 191)
+                print('Trigger bowlFull', lame)
+                data1 = 'OFF'
+                
+            # map curl command e.g.
+            #   /usr/bin/curl  -q --user  'avner:avner4' --header "Content-Type: text/plain" --request POST --data "ON" http://192.168.1.75:8080/rest/items/TestSwitch001
+            # to python requests
+            r = requests.post(url, data=data1, auth=auth1, headers=headers1)
+            continue
+        
         elif lame == -1:
             continue
         else:
