@@ -5,6 +5,9 @@ import cv2
 import json
 import os
 import datetime
+import subprocess
+import requests
+import json
 
 test_json_file = "config.json"
 
@@ -118,11 +121,49 @@ def do_camera_stuff(configuration):
             displayed_image = add_keybindings(displayed_image, configuration)
         # Display the resulting frame
         cv2.imshow("Camera Stream", displayed_image)
+
+        # https://stackoverflow.com/questions/51143458/difference-in-output-with-waitkey0-and-waitkey1/51143586
+        # displays the frame for 1 ms, returns the key (or -1 if nothing was pressed
         lame = cv2.waitKey(1)
+        # print('lame', lame)
         if not lame == -1:
             print('#########', lame, ord('1'), ord('!'), '1'.upper())
+
+        # https://www.w3schools.com/python/ref_func_ord.asp
+        # The ord() function returns the number representing the unicode code of a specified character.
         if lame == ord('\x1b'):
+            # Escape char (hex1b, dec 27)
             break
+        elif lame == ord('\xbe'):
+            # trigger BowlEmpty (F1 - hex: xBE, dec: 190)
+            print('Trigger bowlEmpty', lame)
+
+            subprocess.run(["ls", "-l"])
+            # subprocess.run(["/usr/bin/curl", "-q", "--user", "avner:avner4", "--header", "Content-Type: text/plain", "--request", "POST", "--data", "'ON'", "http://192.168.1.75:8080/rest/items/TestSwitch001"])
+
+            # url = 'http://192.168.1.75:8080/rest/items/TestSwitch001'
+            # payload = {
+            #     "Host": "192.168.1.75",
+            #     "Connection": "keep-alive",
+            #     "Content-Length": 129,
+            #     "Origin": "http://192.168.1.75",
+            #     "Content-Type": "text/plain",
+            #     "Accept": "*/*",
+            #     "Data": "ON",
+            #     "Auth": "avner:avner4",
+            # }
+            # # Adding empty header as parameters are being sent in payload
+            # headers = {}
+            # r = requests.post(url, data=json.dumps(payload), headers=headers)
+            # print(r.content)
+
+
+            # /usr/bin/curl  -q --user 'avner:avner4' --header "Content-Type: text/plain" --request POST --data "ON" http://192.168.1.75:8080/rest/items/TestSwitch001
+            continue
+        elif lame == ord('\xbf'):
+            # trigger BowlFull (F2 - hex: xBF, dec: 191)
+            print('Trigger bowlFull', lame)
+            continue
         elif lame == -1:
             continue
         else:
