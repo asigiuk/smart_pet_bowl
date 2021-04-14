@@ -162,37 +162,6 @@ def add_keybindings(displayed_image, configuration):
     return displayed_image
 
 
-def do_folder_stuff(configuration):
-    import glob
-    # read folder of images
-    da_glob = glob.glob(f"{configuration[INPUT_IMAGE_FOLDER]}/*")
-    for each in da_glob:
-        try:
-            img = cv2.imread(each)
-            displayed_image = cv2.imread(each)
-            filename = os.path.basename(each)
-            cv2.imshow("Camera Stream", displayed_image)
-            lame = cv2.waitKey(0)
-            if lame == ord('q'):
-                break
-            elif lame == -1:
-                continue
-            else:
-                for a_val in configuration[LABELS]:
-                    if lame == ord(a_val):
-                        save_image_name = f"{unique_name_date_time_now()}.{configuration[EXTENSION]}"
-                        # cv2.imwrite(f"{configuration[FOLDERS][a_val]}/{save_image_name}",img)
-                        cv2.imwrite(f"{configuration[FOLDERS][a_val]}/{filename}",img)
-                        print(f"image saved to {configuration[FOLDERS][a_val]}/{filename}-{save_image_name}")
-        except:
-            print(f"{each} failed to open")
-
-
-    # for loop through all images
-    # copy? or move? all images to respective folders
-    print(configuration[ROOT_FOLDER])
-
-
 config = read_json_to_dict(test_json_file)
 prepare_folders_and_options(config)
 if config[CAMERA_MODE]:
