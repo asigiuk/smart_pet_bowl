@@ -134,36 +134,29 @@ def do_camera_stuff(configuration):
         if lame == ord('\x1b'):
             # Escape char (hex1b, dec 27)
             break
-        elif lame == ord('\xbe'):
-            # trigger BowlEmpty (F1 - hex: xBE, dec: 190)
-            print('Trigger bowlEmpty', lame)
+        elif (lame == ord('\xbe')) or (lame == ord('\xbf')):
+            url = 'http://192.168.1.75:8080/rest/items/TestSwitch001'
+            headers1 = {
+                'Content-Type': 'text/plain'
+            }
+            auth1 = ('avner', 'avner4')
 
-            subprocess.run(["ls", "-l"])
-            # subprocess.run(["/usr/bin/curl", "-q", "--user", "avner:avner4", "--header", "Content-Type: text/plain", "--request", "POST", "--data", "'ON'", "http://192.168.1.75:8080/rest/items/TestSwitch001"])
-
-            # url = 'http://192.168.1.75:8080/rest/items/TestSwitch001'
-            # payload = {
-            #     "Host": "192.168.1.75",
-            #     "Connection": "keep-alive",
-            #     "Content-Length": 129,
-            #     "Origin": "http://192.168.1.75",
-            #     "Content-Type": "text/plain",
-            #     "Accept": "*/*",
-            #     "Data": "ON",
-            #     "Auth": "avner:avner4",
-            # }
-            # # Adding empty header as parameters are being sent in payload
-            # headers = {}
-            # r = requests.post(url, data=json.dumps(payload), headers=headers)
-            # print(r.content)
-
-
-            # /usr/bin/curl  -q --user 'avner:avner4' --header "Content-Type: text/plain" --request POST --data "ON" http://192.168.1.75:8080/rest/items/TestSwitch001
+            data1 = 'na'
+            if lame == ord('\xbe'):
+                # trigger BowlEmpty (F1 - hex: xBE, dec: 190)
+                print('Trigger bowlEmpty', lame)
+                data1 = 'ON'
+            else:
+                # trigger BowlFull (F2 - hex: xBF, dec: 191)
+                print('Trigger bowlFull', lame)
+                data1 = 'OFF'
+                
+            # map curl command e.g.
+            #   /usr/bin/curl  -q --user  'avner:avner4' --header "Content-Type: text/plain" --request POST --data "ON" http://192.168.1.75:8080/rest/items/TestSwitch001
+            # to python requests
+            r = requests.post(url, data=data1, auth=auth1, headers=headers1)
             continue
-        elif lame == ord('\xbf'):
-            # trigger BowlFull (F2 - hex: xBF, dec: 191)
-            print('Trigger bowlFull', lame)
-            continue
+        
         elif lame == -1:
             continue
         else:
