@@ -21,6 +21,12 @@
   "max_display_window_height":1000,
   "max_display_window_width":1000,
   "file_extension": "png",
+  "confidence": 0.95,
+  "delay_interval_in_frames": 200,
+  "OffsetX": 520,
+  "OffsetY": 340,
+  "Width": 400,
+  "Height": 400,
   "camera_inference_labels":
   {
     "0": "foodempty",

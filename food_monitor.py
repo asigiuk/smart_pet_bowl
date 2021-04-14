@@ -6,6 +6,7 @@ import json
 import os
 import datetime
 import sys
+from parameters import *
 dirsep = ""
 
 if sys.platform == 'linux' or sys.platform == 'darwin':
@@ -14,21 +15,23 @@ elif sys.platform == 'win32':
     dirsep = '\\'
 
 
-test_json_file = "config.json"
-
-# DICTIONARY CONSTANT STRINGS
-LABELS = "labels"
-FOLDERS = "folders"
-INPUT_IMAGE_FOLDER = "input_image_directory"
-EXPOSURE_TIME = "exposure_time"
-ROOT_FOLDER = "path_to_output_data_root_folder"
-CAMERA_SERIAL = "camera_serial_number"
-MAX_HEIGHT = "max_display_window_height"
-MAX_WIDTH = "max_display_window_width"
-EXTENSION = "file_extension"
-CAMERA_INFERENCE = "do_camera_inference"
-CAMERA_MODE = "camera_mode"
-INFERENCE_LABELS = "camera_inference_labels"
+# test_json_file = "config.json"
+#
+# # DICTIONARY CONSTANT STRINGS
+# LABELS = "labels"
+# FOLDERS = "folders"
+# INPUT_IMAGE_FOLDER = "input_image_directory"
+# EXPOSURE_TIME = "exposure_time"
+# ROOT_FOLDER = "path_to_output_data_root_folder"
+# CAMERA_SERIAL = "camera_serial_number"
+# MAX_HEIGHT = "max_display_window_height"
+# MAX_WIDTH = "max_display_window_width"
+# EXTENSION = "file_extension"
+# CAMERA_INFERENCE = "do_camera_inference"
+# CAMERA_MODE = "camera_mode"
+# INFERENCE_LABELS = "camera_inference_labels"
+# CONFIDENCE= "confidence"
+# DELAY_INTERVAL = "delay_interval_in_frames"
 
 
 def unique_name_date_time_now():
@@ -58,12 +61,13 @@ def prepare_folders_and_options(configuration):
 
 
 def do_camera_stuff(configuration):
+
     camera = Cam(configuration[CAMERA_SERIAL])
     enable_camera_inference = configuration[CAMERA_INFERENCE]
     if enable_camera_inference:
         # try set the camera up for inference
         try:
-            camera.setup_inference_camera_defaults()
+            camera.setup_inference_camera_defaults(OFFSETX=configuration[OFFSETX], OFFSETY=configuration[OFFSETY], WIDTH=configuration[WIDTH], HEIGHT=configuration[HEIGHT])
             camera.EXPOSURE_TIME = configuration[EXPOSURE_TIME]
         except:
             print("Error setting up camera to do inference running in default camera mode.")
@@ -122,13 +126,19 @@ def do_camera_stuff(configuration):
                 f"Class:{configuration[INFERENCE_LABELS][f'{cls}']} | Confidence:{conf*100.0:.2f}",
                 origin, font, font_scale, color, thickness, cv2.LINE_AA)
 
+        # basic filter function
+        if cls != previous_food_status and conf > config[CONFIDENCE]:
+            counter += 1
+
         # change food status
-        if cls != previous_food_status and conf > 0.95:
+        if cls != previous_food_status and conf > config[CONFIDENCE] and counter > config[DELAY_INTERVAL]:
+            # print(counter)
             print(configuration[INFERENCE_LABELS][f'{cls}'])
             previous_food_status = cls
             # save image
             cv2.imwrite(f"{configuration[ROOT_FOLDER]}/food_status.png",img)
             print(f"image saved to {configuration[ROOT_FOLDER]}/food_status.png")
+            counter = 0
 
 
         cv2.imshow("Camera Stream", displayed_image)
@@ -188,6 +198,7 @@ if __name__=='__main__':
         config[ROOT_FOLDER] = '\\'.join(config[ROOT_FOLDER].split('/'))
     # print(config[ROOT_FOLDER])
     prepare_folders_and_options(config)
+    # print(config[OFFSETX])
     if config[CAMERA_MODE]:
         do_camera_stuff(config)
     else:
