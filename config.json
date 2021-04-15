@@ -23,8 +23,8 @@
   "file_extension": "png",
   "confidence": 0.95,
   "delay_interval_in_frames": 200,
-  "OffsetX": 420,
-  "OffsetY": 240,
+  "OffsetX": 100,
+  "OffsetY": 100,
   "Width": 600,
   "Height": 600,
   "camera_inference_labels":

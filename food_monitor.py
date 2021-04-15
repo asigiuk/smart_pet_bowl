@@ -108,7 +108,7 @@ def do_camera_stuff(configuration):
     height = int(img.shape[0] * scale_ratio)
     dim = (width, height)
     previous_food_status = 10
-    # dummy_status = 11
+    dummy_status = 11
     counter = 0
     while True:
         # Capture frame-by-frame
@@ -122,7 +122,7 @@ def do_camera_stuff(configuration):
 
         displayed_image = cv2.resize(img, dim, interpolation=cv2.INTER_AREA)
 
-        # current_food_status = dummy_status
+        current_food_status = dummy_status
         # conf = dummy_status
         if enable_camera_inference:
             origin = (30, 30)

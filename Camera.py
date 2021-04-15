@@ -814,10 +814,6 @@ class Camera(object):
         # turn off Auto white balance
         self.set_selector_to_value(self.nodemap, "BalanceWhiteAuto", "Continuous")
         # set roi
-        offset_X = PySpin.CIntegerPtr(self.nodemap.GetNode('OffsetX'))
-        offset_X.SetValue(OFFSETX)
-        offset_y = PySpin.CIntegerPtr(self.nodemap.GetNode('OffsetY'))
-        offset_y.SetValue(OFFSETY)
         node_width = PySpin.CIntegerPtr(self.nodemap.GetNode('Width'))
         width_to_set = node_width.GetMax()
         node_width.SetValue(WIDTH)
@@ -825,6 +821,14 @@ class Camera(object):
         node_height = PySpin.CIntegerPtr(self.nodemap.GetNode('Height'))
         height_to_set = node_height.GetMax()
         node_height.SetValue(HEIGHT)
+
+        offset_X = PySpin.CIntegerPtr(self.nodemap.GetNode('OffsetX'))
+        print( 'OFFSETX', OFFSETX )
+        offset_X.SetValue(OFFSETX)
+        offset_y = PySpin.CIntegerPtr(self.nodemap.GetNode('OffsetY'))
+        offset_y.SetValue(OFFSETY)
+
+        
         # digital IO line selector 0
         # self.set_selector_to_value(self.nodemap, "LineSelector", self.MASTER_OUTPUT_LINE)
 
