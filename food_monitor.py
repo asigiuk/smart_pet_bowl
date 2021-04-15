@@ -110,6 +110,8 @@ def do_camera_stuff(configuration):
     previous_food_status = 10
     # dummy_status = 11
     counter = 0
+    datetime = list()
+    food_status = list()
     while True:
         # Capture frame-by-frame
         inference_info = ()
@@ -148,12 +150,17 @@ def do_camera_stuff(configuration):
             # print(counter)
             print(configuration[INFERENCE_LABELS][f'{current_food_status}'])
             previous_food_status = current_food_status
+            if current_food_status != 2:
+                food_status.append(current_food_status)
+                datetime.append(unique_name_date_time_now())
+
+
             # save image
             cv2.imwrite(f"{configuration[ROOT_FOLDER]}/food_status.png",img)
             print(f"image saved to {configuration[ROOT_FOLDER]}/food_status.png")
             counter = 0
 
-            # prepare data for post request
+            prepare data for post request
             url = 'http://192.168.1.75:8080/rest/items/TestSwitch001'
             headers1 = {
                 'Content-Type': 'text/plain'
@@ -177,7 +184,7 @@ def do_camera_stuff(configuration):
             else:
                 print('label_name is not supported', label_name)
 
-            
+
         cv2.imshow("Camera Stream", displayed_image)
         lame = cv2.waitKey(1)
         if not lame == -1:
@@ -201,13 +208,40 @@ def do_camera_stuff(configuration):
                 # trigger BowlFull (F2 - hex: xBF, dec: 191)
                 print('Trigger bowlFull', lame)
                 data1 = 'OFF'
-                
+        elif lame == ord('r'):
+            if food_status:
+                count = sum(food_status)
+                new_food_status = list()
+                new_datetime = list()
+                for i, val in enumerate(food_status):
+                    if i < len(food_status)-1:
+                        # print(i,len(food_status))
+                        if  val == 1 and food_status[i+1] == 1:
+                            new_food_status.append(val)
+                            new_food_status.append(0)
+                            new_datetime.append(datetime[i])
+                            new_datetime.append(datetime[i])
+                        elif val == 0 and food_status[i+1] == 0:
+                            continue
+                        else:
+                            new_food_status.append(val)
+                            new_datetime.append(datetime[i])
+                if 1 in new_food_status:
+                    first_foodfull_index = new_food_status.index(1)
+                    with open('report.csv', 'w') as report_file:
+                        count = 0
+                        report_file.write('startfeedtime,endfeedtime,runningcounter\n')
+                        for i in range(first_foodfull_index,len(food_status),2):
+                            count +=1
+                            report_file.write(f'{datetime[i]},{datetime[i+1]},{count}\n')
+
+
             # map curl command e.g.
             #   /usr/bin/curl  -q --user  'avner:avner4' --header "Content-Type: text/plain" --request POST --data "ON" http://192.168.1.75:8080/rest/items/TestSwitch001
             # to python requests
             r = requests.post(url, data=data1, auth=auth1, headers=headers1)
             continue
-        
+
         elif lame == -1:
             continue
         else:
