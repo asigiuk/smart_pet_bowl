@@ -160,7 +160,7 @@ def do_camera_stuff(configuration):
             print(f"image saved to {configuration[ROOT_FOLDER]}/food_status.png")
             counter = 0
 
-            prepare data for post request
+            # prepare data for post request
             url = 'http://192.168.1.75:8080/rest/items/TestSwitch001'
             headers1 = {
                 'Content-Type': 'text/plain'
@@ -209,6 +209,8 @@ def do_camera_stuff(configuration):
                 print('Trigger bowlFull', lame)
                 data1 = 'OFF'
         elif lame == ord('r'):
+            print( 'Pressed "r"' )
+ 
             if food_status:
                 count = sum(food_status)
                 new_food_status = list()
